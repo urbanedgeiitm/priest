@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Priest Dashboard</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <header>
+        <h1>Priest Dashboard</h1>
+        <nav>
+            <a href="index.html">Home</a> |
+            <a href="logout.html">Logout</a>
+        </nav>
+    </header>
+
+    <section id="services">
+        <h2>Manage Your Services</h2>
+        <form id="serviceForm">
+            <label for="service">Service Name:</label>
+            <input type="text" id="service" name="service">
+            <br>
+            <label for="fee">Service Fee:</label>
+            <input type="text" id="fee" name="fee">
+            <br>
+            <label for="availability">Availability:</label>
+            <input type="text" id="availability" name="availability">
+            <br>
+            <button type="submit">Add Service</button>
+        </form>
+    </section>
+
+    <section id="bookings">
+        <h2>Your Bookings</h2>
+        <p>Here you will be able to see all your upcoming bookings.</p>
+        <!-- Booking information will be displayed here -->
+    </section>
+
+    <footer>
+        <p>&copy; 2024 Priest Services Platform</p>
+    </footer>
+</body>
+</html>
