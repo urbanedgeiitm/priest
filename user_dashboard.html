@@ -18,18 +18,88 @@
     <section id="availableServices">
         <h2>Available Services</h2>
         <div id="serviceList">
-            <!-- Services offered by priests will be displayed here -->
+            <p>No services available right now.</p>
         </div>
     </section>
 
     <section id="myBookings">
         <h2>My Bookings</h2>
-        <p>Here you will be able to see all your bookings.</p>
-        <!-- User bookings will be displayed here -->
+        <ul id="bookingsList">
+            <li>No bookings made yet.</li>
+        </ul>
     </section>
 
     <footer>
         <p>&copy; 2024 Priest Services Platform</p>
     </footer>
+
+    <!-- JavaScript for managing services and bookings -->
+    <script>
+        // Load available services from localStorage and display them
+        function loadAvailableServices() {
+            const services = JSON.parse(localStorage.getItem('services')) || [];
+            const serviceListDiv = document.getElementById('serviceList');
+            serviceListDiv.innerHTML = '';
+
+            if (services.length === 0) {
+                serviceListDiv.innerHTML = '<p>No services available right now.</p>';
+            } else {
+                services.forEach((service, index) => {
+                    const serviceDiv = document.createElement('div');
+                    serviceDiv.innerHTML = `
+                        <strong>${service.name}</strong> - Fee: ${service.fee}, Availability: ${service.availability} 
+                        <button onclick="bookService(${index})">Book Now</button>
+                    `;
+                    serviceListDiv.appendChild(serviceDiv);
+                });
+            }
+        }
+
+        // Load existing bookings from localStorage
+        function loadBookings() {
+            const bookings = JSON.parse(localStorage.getItem('bookings')) || [];
+            const bookingsList = document.getElementById('bookingsList');
+            bookingsList.innerHTML = '';
+
+            if (bookings.length === 0) {
+                bookingsList.innerHTML = '<li>No bookings made yet.</li>';
+            } else {
+                bookings.forEach(booking => {
+                    const bookingItem = document.createElement('li');
+                    bookingItem.textContent = `${booking.name} - Fee: ${booking.fee}, Booked on: ${booking.date}`;
+                    bookingsList.appendChild(bookingItem);
+                });
+            }
+        }
+
+        // Book a service by saving it to localStorage
+        function bookService(serviceIndex) {
+            const services = JSON.parse(localStorage.getItem('services')) || [];
+            const selectedService = services[serviceIndex];
+
+            // Get existing bookings
+            let bookings = JSON.parse(localStorage.getItem('bookings')) || [];
+
+            // Add the new booking
+            bookings.push({
+                name: selectedService.name,
+                fee: selectedService.fee,
+                availability: selectedService.availability,
+                date: new Date().toLocaleString() // Record the booking date
+            });
+
+            // Save back to localStorage
+            localStorage.setItem('bookings', JSON.stringify(bookings));
+
+            // Reload the bookings list
+            loadBookings();
+        }
+
+        // Load available services and bookings when the page loads
+        window.onload = function() {
+            loadAvailableServices();
+            loadBookings();
+        }
+    </script>
 </body>
 </html>
