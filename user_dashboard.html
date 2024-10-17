@@ -3,102 +3,100 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>User Dashboard</title>
+    <title>Priest Dashboard</title>
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
     <header>
-        <h1>User Dashboard</h1>
+        <h1>Priest Dashboard</h1>
         <nav>
             <a href="index.html">Home</a> |
             <a href="logout.html">Logout</a>
         </nav>
     </header>
 
-    <section id="availableServices">
-        <h2>Available Services</h2>
-        <div id="serviceList">
-            <p>No services available right now.</p>
-        </div>
+    <section id="manageServices">
+        <h2>Manage Your Services</h2>
+        <form id="addServiceForm">
+            <label for="serviceName">Service Name:</label>
+            <input type="text" id="serviceName" required>
+
+            <label for="serviceFee">Service Fee:</label>
+            <input type="number" id="serviceFee" required>
+
+            <label for="serviceAvailability">Availability:</label>
+            <input type="text" id="serviceAvailability" required>
+
+            <button type="submit">Add Service</button>
+        </form>
     </section>
 
-    <section id="myBookings">
-        <h2>My Bookings</h2>
-        <ul id="bookingsList">
-            <li>No bookings made yet.</li>
-        </ul>
+    <section id="serviceListSection">
+        <h2>Your Services</h2>
+        <div id="priestServiceList">
+            <p>No services added yet.</p>
+        </div>
     </section>
 
     <footer>
         <p>&copy; 2024 Priest Services Platform</p>
     </footer>
 
-    <!-- JavaScript for managing services and bookings -->
     <script>
-        // Load available services from localStorage and display them
-        function loadAvailableServices() {
+        // Load services from localStorage
+        function loadServices() {
             const services = JSON.parse(localStorage.getItem('services')) || [];
-            const serviceListDiv = document.getElementById('serviceList');
+            const serviceListDiv = document.getElementById('priestServiceList');
             serviceListDiv.innerHTML = '';
 
             if (services.length === 0) {
-                serviceListDiv.innerHTML = '<p>No services available right now.</p>';
+                serviceListDiv.innerHTML = '<p>No services added yet.</p>';
             } else {
                 services.forEach((service, index) => {
                     const serviceDiv = document.createElement('div');
                     serviceDiv.innerHTML = `
                         <strong>${service.name}</strong> - Fee: ${service.fee}, Availability: ${service.availability} 
-                        <button onclick="bookService(${index})">Book Now</button>
+                        <button onclick="deleteService(${index})">Delete</button>
                     `;
                     serviceListDiv.appendChild(serviceDiv);
                 });
             }
         }
 
-        // Load existing bookings from localStorage
-        function loadBookings() {
-            const bookings = JSON.parse(localStorage.getItem('bookings')) || [];
-            const bookingsList = document.getElementById('bookingsList');
-            bookingsList.innerHTML = '';
+        // Save the service to localStorage
+        document.getElementById('addServiceForm').addEventListener('submit', function(event) {
+            event.preventDefault();
+            const serviceName = document.getElementById('serviceName').value;
+            const serviceFee = document.getElementById('serviceFee').value;
+            const serviceAvailability = document.getElementById('serviceAvailability').value;
 
-            if (bookings.length === 0) {
-                bookingsList.innerHTML = '<li>No bookings made yet.</li>';
-            } else {
-                bookings.forEach(booking => {
-                    const bookingItem = document.createElement('li');
-                    bookingItem.textContent = `${booking.name} - Fee: ${booking.fee}, Booked on: ${booking.date}`;
-                    bookingsList.appendChild(bookingItem);
-                });
-            }
-        }
-
-        // Book a service by saving it to localStorage
-        function bookService(serviceIndex) {
-            const services = JSON.parse(localStorage.getItem('services')) || [];
-            const selectedService = services[serviceIndex];
-
-            // Get existing bookings
-            let bookings = JSON.parse(localStorage.getItem('bookings')) || [];
-
-            // Add the new booking
-            bookings.push({
-                name: selectedService.name,
-                fee: selectedService.fee,
-                availability: selectedService.availability,
-                date: new Date().toLocaleString() // Record the booking date
+            let services = JSON.parse(localStorage.getItem('services')) || [];
+            services.push({
+                name: serviceName,
+                fee: serviceFee,
+                availability: serviceAvailability
             });
 
-            // Save back to localStorage
-            localStorage.setItem('bookings', JSON.stringify(bookings));
+            localStorage.setItem('services', JSON.stringify(services));
 
-            // Reload the bookings list
-            loadBookings();
+            // Clear the form
+            document.getElementById('addServiceForm').reset();
+
+            // Reload the services list
+            loadServices();
+        });
+
+        // Delete a service
+        function deleteService(serviceIndex) {
+            let services = JSON.parse(localStorage.getItem('services')) || [];
+            services.splice(serviceIndex, 1); // Remove the service from the array
+            localStorage.setItem('services', JSON.stringify(services)); // Update localStorage
+            loadServices(); // Reload the services list
         }
 
-        // Load available services and bookings when the page loads
+        // Load services on page load
         window.onload = function() {
-            loadAvailableServices();
-            loadBookings();
+            loadServices();
         }
     </script>
 </body>
