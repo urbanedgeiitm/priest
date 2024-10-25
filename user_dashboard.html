@@ -35,7 +35,6 @@
 
     <!-- JavaScript for managing services and bookings -->
     <script>
-        // Load available services from localStorage and display them
         function loadAvailableServices() {
             const services = JSON.parse(localStorage.getItem('services')) || [];
             const serviceListDiv = document.getElementById('serviceList');
@@ -55,7 +54,6 @@
             }
         }
 
-        // Load existing bookings from localStorage
         function loadBookings() {
             const bookings = JSON.parse(localStorage.getItem('bookings')) || [];
             const bookingsList = document.getElementById('bookingsList');
@@ -64,38 +62,39 @@
             if (bookings.length === 0) {
                 bookingsList.innerHTML = '<li>No bookings made yet.</li>';
             } else {
-                bookings.forEach(booking => {
+                bookings.forEach((booking, index) => {
                     const bookingItem = document.createElement('li');
-                    bookingItem.textContent = `${booking.name} - Fee: ${booking.fee}, Booked on: ${booking.date}`;
+                    bookingItem.innerHTML = `
+                        ${booking.name} - Fee: ${booking.fee}, Booked on: ${booking.date}
+                        <button onclick="payNow()">Pay Now</button>
+                    `;
                     bookingsList.appendChild(bookingItem);
                 });
             }
         }
 
-        // Book a service by saving it to localStorage
         function bookService(serviceIndex) {
             const services = JSON.parse(localStorage.getItem('services')) || [];
             const selectedService = services[serviceIndex];
 
-            // Get existing bookings
             let bookings = JSON.parse(localStorage.getItem('bookings')) || [];
 
-            // Add the new booking
             bookings.push({
                 name: selectedService.name,
                 fee: selectedService.fee,
                 availability: selectedService.availability,
-                date: new Date().toLocaleString() // Record the booking date
+                date: new Date().toLocaleString()
             });
 
-            // Save back to localStorage
             localStorage.setItem('bookings', JSON.stringify(bookings));
-
-            // Reload the bookings list
             loadBookings();
         }
 
-        // Load available services and bookings when the page loads
+        // Redirect to your Razorpay payment link
+        function payNow() {
+            window.location.href = "https://razorpay.me/@rahulkumarsingh411"; // Add your Razorpay link here
+        }
+
         window.onload = function() {
             loadAvailableServices();
             loadBookings();
