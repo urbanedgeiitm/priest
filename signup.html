@@ -44,6 +44,36 @@
         <p>&copy; 2024 Priest Services Platform</p>
     </footer>
 
-    <script src="script.js"></script>
+    <script>
+        document.getElementById('signupForm').addEventListener('submit', function(event) {
+            event.preventDefault();
+
+            const role = document.getElementById('role').value;
+            const name = document.getElementById('name').value;
+            const email = document.getElementById('email').value;
+            const password = document.getElementById('password').value;
+            const location = document.getElementById('location').value;
+
+            // Check if users exist in localStorage
+            const users = JSON.parse(localStorage.getItem('users')) || [];
+
+            // Add new user data
+            users.push({
+                role,
+                name,
+                email,
+                password,
+                location
+            });
+
+            // Save updated users array back to localStorage
+            localStorage.setItem('users', JSON.stringify(users));
+
+            alert('Account created successfully! You can now log in.');
+
+            // Redirect to login page
+            window.location.href = 'login.html';
+        });
+    </script>
 </body>
 </html>
