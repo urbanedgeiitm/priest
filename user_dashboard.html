@@ -22,6 +22,11 @@
         </div>
     </section>
 
+    <section id="priestProfile">
+        <h2>Priest Profile</h2>
+        <div id="priestProfileDetails"></div>
+    </section>
+
     <section id="myBookings">
         <h2>My Bookings</h2>
         <ul id="bookingsList">
@@ -35,78 +40,6 @@
 
     <!-- JavaScript for managing services and bookings -->
     <script>
+        // Load available services from localStorage and display them
         function loadAvailableServices() {
-            const services = JSON.parse(localStorage.getItem('services')) || [];
-            const serviceListDiv = document.getElementById('serviceList');
-            serviceListDiv.innerHTML = '';
-
-            if (services.length === 0) {
-                serviceListDiv.innerHTML = '<p>No services available right now.</p>';
-            } else {
-                services.forEach((service, index) => {
-                    const serviceDiv = document.createElement('div');
-                    serviceDiv.innerHTML = `
-                        <strong>${service.name}</strong> - Fee: ${service.fee}, Availability: ${service.availability} 
-                        <button onclick="bookService(${index})">Book Now</button>
-                    `;
-                    serviceListDiv.appendChild(serviceDiv);
-                });
-            }
-        }
-
-        function loadBookings() {
-            const bookings = JSON.parse(localStorage.getItem('bookings')) || [];
-            const bookingsList = document.getElementById('bookingsList');
-            bookingsList.innerHTML = '';
-
-            if (bookings.length === 0) {
-                bookingsList.innerHTML = '<li>No bookings made yet.</li>';
-            } else {
-                bookings.forEach((booking, index) => {
-                    const bookingItem = document.createElement('li');
-                    bookingItem.innerHTML = `
-                        ${booking.name} - Fee: ${booking.fee}, Booked on: ${booking.date}, Payment Status: ${booking.paymentStatus}
-                        <button onclick="payNow()">Pay Now</button>
-                    `;
-                    bookingsList.appendChild(bookingItem);
-                });
-            }
-        }
-
-        function bookService(serviceIndex) {
-            const services = JSON.parse(localStorage.getItem('services')) || [];
-            const selectedService = services[serviceIndex];
-
-            // Get existing bookings
-            let bookings = JSON.parse(localStorage.getItem('bookings')) || [];
-
-            // Add the new booking, including payment status and priest details
-            bookings.push({
-                name: selectedService.name,
-                fee: selectedService.fee,
-                availability: selectedService.availability,
-                date: new Date().toLocaleString(), // Record the booking date
-                priest: selectedService.priest || 'Unknown Priest', // Assuming service has associated priest
-                paymentStatus: 'Pending' // Initially, the payment status is 'Pending'
-            });
-
-            // Save back to localStorage
-            localStorage.setItem('bookings', JSON.stringify(bookings));
-            
-            // Reload the bookings list
-            loadBookings();
-        }
-
-        // Redirect to your Razorpay payment link
-        function payNow() {
-            window.location.href = "https://razorpay.me/@rahulkumarsingh411"; // Add your Razorpay link here
-        }
-
-        // Load available services and bookings when the page loads
-        window.onload = function() {
-            loadAvailableServices();
-            loadBookings();
-        }
-    </script>
-</body>
-</html>
+            const services = JSON.parse(localStorage.getItem('services'))
