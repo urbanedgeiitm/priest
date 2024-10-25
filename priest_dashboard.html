@@ -15,6 +15,23 @@
         </nav>
     </header>
 
+    <section id="priestDetails">
+        <h2>Priest Profile</h2>
+        <form id="priestProfileForm">
+            <label for="priestName">Priest Name:</label>
+            <input type="text" id="priestName" name="priestName" required>
+            <br>
+            <label for="pujasPerformed">Number of Pujas Performed:</label>
+            <input type="number" id="pujasPerformed" name="pujasPerformed" required>
+            <br>
+            <label for="priestPhoto">Upload Profile Photo:</label>
+            <input type="file" id="priestPhoto" name="priestPhoto" accept="image/*" required>
+            <br>
+            <button type="submit">Save Profile</button>
+        </form>
+        <div id="priestProfilePreview"></div>
+    </section>
+
     <section id="services">
         <h2>Manage Your Services</h2>
         <form id="addServiceForm">
@@ -53,64 +70,49 @@
 
     <!-- JavaScript Code -->
     <script>
-        // Function to toggle custom time slot input visibility
-        function toggleCustomTimeInput() {
-            const timeOption = document.getElementById('serviceTimeOption').value;
-            const customTimeSlot = document.getElementById('customTimeSlot');
-            const customTimeLabel = document.getElementById('customTimeLabel');
-
-            if (timeOption === 'custom') {
-                customTimeSlot.style.display = 'inline';
-                customTimeLabel.style.display = 'inline';
-            } else {
-                customTimeSlot.style.display = 'none';
-                customTimeLabel.style.display = 'none';
-            }
-        }
-
-        // Validate that the service fee input contains only numbers
-        function validateServiceFee(fee) {
-            const rupeeRegex = /^[0-9]+(\.[0-9]{1,2})?$/; // Regular expression for valid rupee values
-            return rupeeRegex.test(fee);
-        }
-
-        // Save the service to localStorage
-        document.getElementById('addServiceForm').addEventListener('submit', function(event) {
+        // Save priest profile
+        document.getElementById('priestProfileForm').addEventListener('submit', function(event) {
             event.preventDefault();
 
-            const serviceName = document.getElementById('serviceName').value;
-            const serviceFee = document.getElementById('serviceFee').value;
-            const serviceAvailabilityDate = document.getElementById('serviceAvailabilityDate').value;
-            const timeOption = document.getElementById('serviceTimeOption').value;
-            const customTimeSlot = document.getElementById('customTimeSlot').value;
+            const priestName = document.getElementById('priestName').value;
+            const pujasPerformed = document.getElementById('pujasPerformed').value;
+            const priestPhotoFile = document.getElementById('priestPhoto').files[0];
+            
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                const priestPhoto = e.target.result; // Base64 image
 
-            // Validate that the service fee is in rupees (numbers only)
-            if (!validateServiceFee(serviceFee)) {
-                alert("Please enter a valid amount in rupees.");
-                return; // Stop form submission if validation fails
-            }
+                // Save the profile details in localStorage
+                const priestProfile = {
+                    name: priestName,
+                    pujasPerformed: pujasPerformed,
+                    photo: priestPhoto // Store the Base64 image
+                };
+                localStorage.setItem('priestProfile', JSON.stringify(priestProfile));
 
-            // Determine the final time slot (predefined or custom)
-            let serviceTimeSlot = timeOption;
-            if (timeOption === 'custom') {
-                serviceTimeSlot = customTimeSlot; // Use custom time if selected
-            }
-
-            let services = JSON.parse(localStorage.getItem('services')) || [];
-            services.push({
-                name: serviceName,
-                fee: `₹${serviceFee}`, // Append the rupee symbol to the fee
-                availability: `${serviceAvailabilityDate} ${serviceTimeSlot}`
-            });
-
-            localStorage.setItem('services', JSON.stringify(services));
-
-            // Clear the form
-            document.getElementById('addServiceForm').reset();
-
-            // Reload the services list
-            loadServices();
+                // Display profile preview
+                displayPriestProfile(priestProfile);
+            };
+            reader.readAsDataURL(priestPhotoFile);
         });
+
+        // Function to display priest profile preview
+        function displayPriestProfile(profile) {
+            const profilePreviewDiv = document.getElementById('priestProfilePreview');
+            profilePreviewDiv.innerHTML = `
+                <img src="${profile.photo}" alt="Priest Photo" width="100"><br>
+                <strong>${profile.name}</strong><br>
+                Pujas Performed: ${profile.pujasPerformed}
+            `;
+        }
+
+        // Function to load the priest profile if it exists
+        function loadPriestProfile() {
+            const storedProfile = JSON.parse(localStorage.getItem('priestProfile')) || null;
+            if (storedProfile) {
+                displayPriestProfile(storedProfile);
+            }
+        }
 
         // Load services from localStorage
         function loadServices() {
@@ -124,7 +126,7 @@
                 services.forEach((service, index) => {
                     const serviceDiv = document.createElement('div');
                     serviceDiv.innerHTML = `
-                        <strong>${service.name}</strong> - Fee: ${service.fee}, Availability: ${service.availability} 
+                        <strong>${service.name}</strong> - Fee: ₹${service.fee}, Availability: ${service.availability} 
                         <button onclick="deleteService(${index})">Delete</button>
                     `;
                     serviceListDiv.appendChild(serviceDiv);
@@ -132,18 +134,34 @@
             }
         }
 
-        // Function to delete a service
-        function deleteService(serviceIndex) {
-            let services = JSON.parse(localStorage.getItem('services')) || [];
-            services.splice(serviceIndex, 1); // Remove the selected service
-            localStorage.setItem('services', JSON.stringify(services)); // Update localStorage
-            loadServices(); // Reload the list of services
-        }
-
-        // Load services on page load
+        // Load profile and services on page load
         window.onload = function() {
+            loadPriestProfile();
             loadServices();
         }
+
+        // Save the service to localStorage
+        document.getElementById('addServiceForm').addEventListener('submit', function(event) {
+            event.preventDefault();
+
+            const serviceName = document.getElementById('serviceName').value;
+            const serviceFee = document.getElementById('serviceFee').value;
+            const serviceAvailabilityDate = document.getElementById('serviceAvailabilityDate').value;
+            const timeOption = document.getElementById('serviceTimeOption').value;
+            const customTimeSlot = document.getElementById('customTimeSlot').value;
+
+            let serviceTimeSlot = timeOption === 'custom' ? customTimeSlot : timeOption;
+
+            let services = JSON.parse(localStorage.getItem('services')) || [];
+            services.push({
+                name: serviceName,
+                fee: serviceFee,
+                availability: `${serviceAvailabilityDate} ${serviceTimeSlot}`
+            });
+
+            localStorage.setItem('services', JSON.stringify(services));
+            loadServices();
+        });
     </script>
 </body>
 </html>
