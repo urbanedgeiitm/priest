@@ -15,85 +15,135 @@
         </nav>
     </header>
 
-   <section id="services">
-    <h2>Manage Your Services</h2>
-    <form id="serviceForm">
-        <label for="service">Service Name:</label>
-        <input type="text" id="service" name="service" required>
-        <br>
-        <label for="fee">Service Fee:</label>
-        <input type="text" id="fee" name="fee" required>
-        <br>
-        <label for="availabilityDate">Availability Date:</label>
-        <input type="date" id="availabilityDate" name="availabilityDate" required>
-        <br>
-        <label for="availabilityTime">Availability Time Slot:</label>
-        <select id="availabilityTime" name="availabilityTime" required>
-            <option value="Morning (9 AM - 12 PM)">Morning (9 AM - 12 PM)</option>
-            <option value="Afternoon (12 PM - 3 PM)">Afternoon (12 PM - 3 PM)</option>
-            <option value="Evening (3 PM - 6 PM)">Evening (3 PM - 6 PM)</option>
-        </select>
-        <br>
-        <button type="submit">Add Service</button>
-    </form>
-    <h3>Current Services:</h3>
-    <ul id="serviceList"></ul>
-</section>
-
-<script>
-    // Function to load services from localStorage
-    function loadServices() {
-        const services = JSON.parse(localStorage.getItem('services')) || [];
-        const serviceList = document.getElementById('serviceList');
-        serviceList.innerHTML = '';
-        services.forEach(service => {
-            const li = document.createElement('li');
-            li.textContent = `${service.name} - Fee: ${service.fee}, Availability: ${service.availability}`;
-            serviceList.appendChild(li);
-        });
-    }
-
-    // Load services when page loads
-    window.onload = function() {
-        loadServices();
-    }
-
-    // Handle form submission
-    document.getElementById('serviceForm').addEventListener('submit', function(event) {
-        event.preventDefault();
-        const serviceName = document.getElementById('service').value;
-        const serviceFee = document.getElementById('fee').value;
-        const serviceAvailabilityDate = document.getElementById('availabilityDate').value;
-        const serviceAvailabilityTime = document.getElementById('availabilityTime').value;
-        const serviceAvailability = `${serviceAvailabilityDate} - ${serviceAvailabilityTime}`;
-        
-        // Get existing services from localStorage
-        let services = JSON.parse(localStorage.getItem('services')) || [];
-        
-        // Add new service
-        services.push({ name: serviceName, fee: serviceFee, availability: serviceAvailability });
-        
-        // Save back to localStorage
-        localStorage.setItem('services', JSON.stringify(services));
-        
-        // Reload service list
-        loadServices();
-        
-        // Clear form
-        document.getElementById('serviceForm').reset();
-    });
-</script>
-
+    <section id="services">
+        <h2>Manage Your Services</h2>
+        <form id="addServiceForm">
+            <label for="serviceName">Service Name:</label>
+            <input type="text" id="serviceName" name="serviceName" required>
+            <br>
+            <label for="serviceFee">Service Fee (₹):</label>
+            <input type="text" id="serviceFee" name="serviceFee" required placeholder="Enter amount in rupees">
+            <br>
+            <label for="serviceAvailabilityDate">Availability Date:</label>
+            <input type="date" id="serviceAvailabilityDate" name="serviceAvailabilityDate" required>
+            <br>
+            <label for="serviceTimeOption">Select Time Slot:</label>
+            <select id="serviceTimeOption" name="serviceTimeOption" onchange="toggleCustomTimeInput()" required>
+                <option value="Morning (9 AM - 12 PM)">Morning (9 AM - 12 PM)</option>
+                <option value="Afternoon (12 PM - 3 PM)">Afternoon (12 PM - 3 PM)</option>
+                <option value="Evening (3 PM - 6 PM)">Evening (3 PM - 6 PM)</option>
+                <option value="custom">Enter Custom Time</option>
+            </select>
+            <br>
+            <label for="customTimeSlot" id="customTimeLabel" style="display: none;">Custom Time Slot:</label>
+            <input type="time" id="customTimeSlot" name="customTimeSlot" style="display: none;">
+            <br>
+            <button type="submit">Add Service</button>
+        </form>
     </section>
 
-    <section id="bookings">
-        <h2>Your Bookings</h2>
-        <p>Here you will be able to see all your upcoming bookings.</p>
-        <!-- Booking information will be displayed here -->
+    <section>
+        <h3>Current Services:</h3>
+        <div id="priestServiceList"></div>
     </section>
 
     <footer>
         <p>&copy; 2024 Priest Services Platform</p>
     </footer>
+
+    <!-- JavaScript Code -->
+    <script>
+        // Function to toggle custom time slot input visibility
+        function toggleCustomTimeInput() {
+            const timeOption = document.getElementById('serviceTimeOption').value;
+            const customTimeSlot = document.getElementById('customTimeSlot');
+            const customTimeLabel = document.getElementById('customTimeLabel');
+
+            if (timeOption === 'custom') {
+                customTimeSlot.style.display = 'inline';
+                customTimeLabel.style.display = 'inline';
+            } else {
+                customTimeSlot.style.display = 'none';
+                customTimeLabel.style.display = 'none';
+            }
+        }
+
+        // Validate that the service fee input contains only numbers
+        function validateServiceFee(fee) {
+            const rupeeRegex = /^[0-9]+(\.[0-9]{1,2})?$/; // Regular expression for valid rupee values
+            return rupeeRegex.test(fee);
+        }
+
+        // Save the service to localStorage
+        document.getElementById('addServiceForm').addEventListener('submit', function(event) {
+            event.preventDefault();
+
+            const serviceName = document.getElementById('serviceName').value;
+            const serviceFee = document.getElementById('serviceFee').value;
+            const serviceAvailabilityDate = document.getElementById('serviceAvailabilityDate').value;
+            const timeOption = document.getElementById('serviceTimeOption').value;
+            const customTimeSlot = document.getElementById('customTimeSlot').value;
+
+            // Validate that the service fee is in rupees (numbers only)
+            if (!validateServiceFee(serviceFee)) {
+                alert("Please enter a valid amount in rupees.");
+                return; // Stop form submission if validation fails
+            }
+
+            // Determine the final time slot (predefined or custom)
+            let serviceTimeSlot = timeOption;
+            if (timeOption === 'custom') {
+                serviceTimeSlot = customTimeSlot; // Use custom time if selected
+            }
+
+            let services = JSON.parse(localStorage.getItem('services')) || [];
+            services.push({
+                name: serviceName,
+                fee: `₹${serviceFee}`, // Append the rupee symbol to the fee
+                availability: `${serviceAvailabilityDate} ${serviceTimeSlot}`
+            });
+
+            localStorage.setItem('services', JSON.stringify(services));
+
+            // Clear the form
+            document.getElementById('addServiceForm').reset();
+
+            // Reload the services list
+            loadServices();
+        });
+
+        // Load services from localStorage
+        function loadServices() {
+            const services = JSON.parse(localStorage.getItem('services')) || [];
+            const serviceListDiv = document.getElementById('priestServiceList');
+            serviceListDiv.innerHTML = '';
+
+            if (services.length === 0) {
+                serviceListDiv.innerHTML = '<p>No services added yet.</p>';
+            } else {
+                services.forEach((service, index) => {
+                    const serviceDiv = document.createElement('div');
+                    serviceDiv.innerHTML = `
+                        <strong>${service.name}</strong> - Fee: ${service.fee}, Availability: ${service.availability} 
+                        <button onclick="deleteService(${index})">Delete</button>
+                    `;
+                    serviceListDiv.appendChild(serviceDiv);
+                });
+            }
+        }
+
+        // Function to delete a service
+        function deleteService(serviceIndex) {
+            let services = JSON.parse(localStorage.getItem('services')) || [];
+            services.splice(serviceIndex, 1); // Remove the selected service
+            localStorage.setItem('services', JSON.stringify(services)); // Update localStorage
+            loadServices(); // Reload the list of services
+        }
+
+        // Load services on page load
+        window.onload = function() {
+            loadServices();
+        }
+    </script>
 </body>
 </html>
