@@ -24,8 +24,15 @@
         <label for="fee">Service Fee:</label>
         <input type="text" id="fee" name="fee" required>
         <br>
-        <label for="availability">Availability:</label>
-        <input type="text" id="availability" name="availability" required>
+        <label for="availabilityDate">Availability Date:</label>
+        <input type="date" id="availabilityDate" name="availabilityDate" required>
+        <br>
+        <label for="availabilityTime">Availability Time Slot:</label>
+        <select id="availabilityTime" name="availabilityTime" required>
+            <option value="Morning (9 AM - 12 PM)">Morning (9 AM - 12 PM)</option>
+            <option value="Afternoon (12 PM - 3 PM)">Afternoon (12 PM - 3 PM)</option>
+            <option value="Evening (3 PM - 6 PM)">Evening (3 PM - 6 PM)</option>
+        </select>
         <br>
         <button type="submit">Add Service</button>
     </form>
@@ -56,7 +63,9 @@
         event.preventDefault();
         const serviceName = document.getElementById('service').value;
         const serviceFee = document.getElementById('fee').value;
-        const serviceAvailability = document.getElementById('availability').value;
+        const serviceAvailabilityDate = document.getElementById('availabilityDate').value;
+        const serviceAvailabilityTime = document.getElementById('availabilityTime').value;
+        const serviceAvailability = `${serviceAvailabilityDate} - ${serviceAvailabilityTime}`;
         
         // Get existing services from localStorage
         let services = JSON.parse(localStorage.getItem('services')) || [];
