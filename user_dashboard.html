@@ -65,7 +65,7 @@
                 bookings.forEach((booking, index) => {
                     const bookingItem = document.createElement('li');
                     bookingItem.innerHTML = `
-                        ${booking.name} - Fee: ${booking.fee}, Booked on: ${booking.date}
+                        ${booking.name} - Fee: ${booking.fee}, Booked on: ${booking.date}, Payment Status: ${booking.paymentStatus}
                         <button onclick="payNow()">Pay Now</button>
                     `;
                     bookingsList.appendChild(bookingItem);
@@ -77,16 +77,23 @@
             const services = JSON.parse(localStorage.getItem('services')) || [];
             const selectedService = services[serviceIndex];
 
+            // Get existing bookings
             let bookings = JSON.parse(localStorage.getItem('bookings')) || [];
 
+            // Add the new booking, including payment status and priest details
             bookings.push({
                 name: selectedService.name,
                 fee: selectedService.fee,
                 availability: selectedService.availability,
-                date: new Date().toLocaleString()
+                date: new Date().toLocaleString(), // Record the booking date
+                priest: selectedService.priest || 'Unknown Priest', // Assuming service has associated priest
+                paymentStatus: 'Pending' // Initially, the payment status is 'Pending'
             });
 
+            // Save back to localStorage
             localStorage.setItem('bookings', JSON.stringify(bookings));
+            
+            // Reload the bookings list
             loadBookings();
         }
 
@@ -95,6 +102,7 @@
             window.location.href = "https://razorpay.me/@rahulkumarsingh411"; // Add your Razorpay link here
         }
 
+        // Load available services and bookings when the page loads
         window.onload = function() {
             loadAvailableServices();
             loadBookings();
