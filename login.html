@@ -5,6 +5,10 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Login</title>
     <link rel="stylesheet" href="style.css">
+
+    <!-- Google Sign-In JavaScript SDK -->
+    <meta name="google-signin-client_id" content="211997350279-bfvrvmgu516sfomfb0ac475gadvlzl9t.apps.googleusercontent.com">
+    <script src="https://apis.google.com/js/platform.js" async defer></script>
 </head>
 <body>
     <header>
@@ -16,6 +20,7 @@
     </header>
 
     <main>
+        <!-- Existing Login Form -->
         <form action="login.php" method="POST">
             <label for="username">Username:</label>
             <input type="text" id="username" name="username" required><br>
@@ -25,6 +30,28 @@
 
             <button type="submit">Login</button>
         </form>
+
+        <h2>OR</h2>
+
+        <!-- Google Sign-In Button -->
+        <div class="g-signin2" data-onsuccess="onSignIn"></div>
+
+        <script>
+            function onSignIn(googleUser) {
+                // Get the user's profile information
+                var profile = googleUser.getBasicProfile();
+                console.log("ID: " + profile.getId());
+                console.log('Full Name: ' + profile.getName());
+                console.log('Email: ' + profile.getEmail());
+
+                // The ID token that you need to pass to your backend for verification
+                var id_token = googleUser.getAuthResponse().id_token;
+                console.log("ID Token: " + id_token);
+
+                // Redirect the user to their dashboard (you can adjust this based on role or other criteria)
+                window.location.href = "user_dashboard.html"; // You can dynamically determine the role and redirect to priest or user dashboard
+            }
+        </script>
     </main>
 
     <footer>
