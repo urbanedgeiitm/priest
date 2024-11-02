@@ -34,7 +34,8 @@
             <input type="password" id="password" name="password" required>
 
             <label for="location">Location:</label>
-            <input type="text" id="location" name="location" required>
+            <input type="text" id="location" name="location" list="city-suggestions" required>
+            <datalist id="city-suggestions"></datalist>
 
             <button type="submit">Sign Up</button>
         </form>
@@ -45,6 +46,21 @@
     </footer>
 
     <script>
+        const cities = [
+            "Mumbai", "Delhi", "Bengaluru", "Hyderabad", "Ahmedabad", "Chennai", "Kolkata", "Surat", "Pune", 
+            "Jaipur", "Patna", "Ranchi", "Gaya", "Bhagalpur", "Muzaffarpur", "Purnia", "Darbhanga", "Dhanbad", 
+            "Bokaro Steel City", "Deoghar", "Phusro", "Hazaribagh", "Giridih", "Ramgarh", "Medininagar",
+            // Add more Indian cities here, especially from Bihar and Jharkhand
+        ];
+
+        document.getElementById('location').addEventListener('input', function() {
+            let input = this.value.toLowerCase();
+            let suggestions = cities.filter(city => city.toLowerCase().startsWith(input));
+
+            let datalist = document.getElementById('city-suggestions');
+            datalist.innerHTML = suggestions.map(city => `<option value="${city}"></option>`).join('');
+        });
+
         document.getElementById('signupForm').addEventListener('submit', function(event) {
             event.preventDefault();
 
